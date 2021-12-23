@@ -1,0 +1,64 @@
+{
+	"name": "BuildProductDimension",
+	"properties": {
+		"folder": {
+			"name": "A-Day-full-of-Azure-data-factory"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ADLS_Product",
+						"type": "DatasetReference"
+					},
+					"name": "Product"
+				},
+				{
+					"dataset": {
+						"referenceName": "ADLS_ProductCategory",
+						"type": "DatasetReference"
+					},
+					"name": "ProductCategory"
+				},
+				{
+					"dataset": {
+						"referenceName": "ADLS_ProductModel",
+						"type": "DatasetReference"
+					},
+					"name": "ProductModel"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "writeToADLS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectProductCoulumns"
+				},
+				{
+					"name": "SelectProductCategory"
+				},
+				{
+					"name": "SelectProductModel"
+				},
+				{
+					"name": "LookProductCategory"
+				},
+				{
+					"name": "LookupProductModel"
+				},
+				{
+					"name": "removethedupicates"
+				}
+			],
+			"script": "source(output(\n\t\tProductID as short,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as double,\n\t\tListPrice as double,\n\t\tSize as string,\n\t\tWeight as double,\n\t\tProductCategoryID as short,\n\t\tProductModelID as short,\n\t\tSellStartDate as string,\n\t\tSellEndDate as string,\n\t\tDiscontinuedDate as string,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Product\nsource(output(\n\t\tProductCategoryID as short,\n\t\tParentProductCategoryID as short,\n\t\tName as string,\n\t\trowguid as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductCategory\nsource(output(\n\t\tProductModelID as short,\n\t\tName as string,\n\t\tCatalogDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModel\nProduct select(mapColumn(\n\t\tProductID,\n\t\tProduct = Name,\n\t\tProductCategoryID,\n\t\tProductModelID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProductCoulumns\nProductCategory select(mapColumn(\n\t\tProductCategoryID,\n\t\tProductCategory = Name\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProductCategory\nProductModel select(mapColumn(\n\t\tProductModelID,\n\t\tProductModel = Name\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProductModel\nSelectProductCoulumns, SelectProductCategory lookup(SelectProductCoulumns@ProductCategoryID == SelectProductCategory@ProductCategoryID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookProductCategory\nLookProductCategory, SelectProductModel lookup(SelectProductCoulumns@ProductModelID == SelectProductModel@ProductModelID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProductModel\nLookupProductModel select(mapColumn(\n\t\tProductID,\n\t\tProduct,\n\t\tProductCategoryID = SelectProductCoulumns@ProductCategoryID,\n\t\tProductModelID = SelectProductCoulumns@ProductModelID,\n\t\tProductCategory,\n\t\tProductModel\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> removethedupicates\nremovethedupicates sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tumask: 0022,\n\tpreCommands: [],\n\tpostCommands: [],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> writeToADLS"
+		}
+	}
+}

@@ -1,0 +1,11 @@
+{
+	"name": "ls_gen2",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlsgen2storageh1.dfs.core.windows.net"
+		}
+	}
+}

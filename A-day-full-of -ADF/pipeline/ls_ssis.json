@@ -1,0 +1,38 @@
+{
+	"name": "ls_ssis",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute SSIS package",
+				"type": "ExecuteSSISPackage",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"packageLocation": {
+						"packagePath": "onpremtoazure/SsisPackages/CopyProductCategory.dtsx",
+						"type": "SSISDB"
+					},
+					"environmentPath": null,
+					"connectVia": {
+						"referenceName": "AzureSSIS-IR",
+						"type": "IntegrationRuntimeReference"
+					},
+					"loggingLevel": "Basic"
+				}
+			}
+		],
+		"folder": {
+			"name": "A-Day-Full-of-Azure-Data-Factory"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-12-22T01:36:37Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

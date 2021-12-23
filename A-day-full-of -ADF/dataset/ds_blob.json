@@ -1,0 +1,19 @@
+{
+	"name": "ds_blob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_blob_adv",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "products"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
